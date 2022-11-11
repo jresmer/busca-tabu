@@ -9,6 +9,7 @@ class TabuSearch:
 		self.opt_value = self.obj_func(self.s)
 		self.tabu_list = TabuList()
 
+	# avarage time:
 	def obj_func(self, solution):
 		pass
 
