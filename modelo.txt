@@ -1,0 +1,43 @@
+from code.tabuList import TabuList
+from code.neighbourhood import Neighbourhood
+
+class TabuSearch:
+
+	def __init__(self):
+		self.s = load()
+		self.best_solution = self.s
+		self.opt_value = self.obj_func(self.s)
+		self.tabu_list = TabuList()
+
+	def obj_func(self, solution):
+		pass
+
+	def loop(self):	
+
+		while budget > 0:
+			neighbourhood = Neighbourhood(self.s)
+			opt_nb = neighbourhood[0]
+			value = self.obj_func(opt_nb)			
+
+			for _s in neighbourhood:
+				_value = self.obj_func(_s)
+				if _s not in self.tabu_list and _value < value:
+					value = _value
+					opt_nb = _s
+		
+			if self.opt_value >= value:
+				self.best_solution = opt_nb
+
+			self.tabu_list.update(self.s)
+			self.s = opt_nb
+
+
+	...
+		
+
+					
+
+	
+
+
+
