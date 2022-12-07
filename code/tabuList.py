@@ -3,7 +3,7 @@ class TabuList:
 
     # CRIA LISTA DE SOLUCOES
     # SETTA NUMERO DE ITERACOES QUE UMA SOLUCAO DEVE PERMANECER NA LISTA
-    def __init__(self, iteration_counter=50, *args):
+    def __init__(self, iteration_counter=4, *args):
         self.__iteration_counter = iteration_counter
         self.__iteration_reset_value = iteration_counter
         self.__list = list(args)
