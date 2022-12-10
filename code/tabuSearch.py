@@ -11,7 +11,7 @@ class TabuSearch:
     def __init__(self, dist, steps=50):
         self.s = self.get_first_solution(dist, steps)
         self.best_solution = self.s
-        self.opt_value = self.obj_function_extremities(self.s)
+        self.opt_value = self.obj_function_radom(self.s)
         self.tabu_list = TabuList()
 
     # Escolher um vizinho aleatorio
@@ -22,21 +22,23 @@ class TabuSearch:
         s = __graph
         if random:
             for _ in range(steps):
-                nd = Neighbourhood(s)
+                nd = Neighbourhood()
+                nd.generate_neighbourhood(s)
                 s = nd.neighbourhood[randint(0, len(nd.neighbourhood))]
         else:
             for _ in range(steps):
-                nd = Neighbourhood(s)
-                value = self.obj_function_extremities(s)
+                nd = Neighbourhood()
+                nd.generate_neighbourhood(s)
+                value = self.obj_function_radom(s)
                 for _s in nd.neighbourhood:
-                    _value = self.obj_function_extremities(_s)
+                    _value = self.obj_function_radom(_s)
                     if _value < value:
                         s = _s
                         value = _value
         return s
 
     # Acelerar com paralelismo:
-    def obj_function_radom(self, solution, num_tests, attempt_limit=10000) -> float:
+    def obj_function_radom(self, solution, num_tests=100, attempt_limit=10000) -> float:
         node_list = list(solution.nodes)
         already_tested = []
         length = len(node_list)
@@ -73,44 +75,16 @@ class TabuSearch:
             return t_time / t_routes
         return 0
 
-
-    def obj_function_extremities(self, solution, num_tests=100) -> float:
-        origin = list(solution.nodes)
-        origin.sort()
-        dest = list(solution.nodes)
-        dest.sort(reverse=True)
-
-        t_routes = 0
-        t_time = 0
-
-        for i in range(len(origin)):
-            if origin == dest or not nx.has_path(solution, origin[i], dest[i]):
-                continue
-
-            shortest_path_length = nx.shortest_path_length(solution, origin[i], dest[i],
-                                                           weight='travel_time', method='bellman-ford')
-            if shortest_path_length != 0 and shortest_path_length != None:
-                t_time += shortest_path_length
-                t_routes += 1
-
-            if t_routes == num_tests:
-                break
-
-        if t_routes > 0:
-            print(f"Number of paths tested : {t_routes}")
-            return t_time / t_routes
-        return 0
-
     # Terminar get_best_neighbour para substituir generate_neighbourhood:
     def loop(self):
         for _ in range(50):
             nd = Neighbourhood()
             nd.generate_neighbourhood(self.s, self.tabu_list)
             opt_nb = nd.neighbourhood[0]
-            value = self.obj_function_extremities(opt_nb)
+            value = self.obj_function_radom(opt_nb)
 
             for _s in nd.neighbourhood:
-                _value = self.obj_function_extremities(_s)
+                _value = self.obj_function_radom(_s)
                 if _s not in self.tabu_list and _value != 0 and _value < value:
                     value = _value
                     opt_nb = _s

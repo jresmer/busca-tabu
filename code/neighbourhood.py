@@ -29,7 +29,7 @@ class Neighbourhood(metaclass=SingletonMeta):
     def get_best_neighbour(self, solution, tabu_list):
         pass
 
-    def generate_neighbourhood(self, solution, tabu_list, max_bool=False):
+    def generate_neighbourhood(self, solution, tabu_list=TabuList(), max_bool=False):
         solution = ox.add_edge_travel_times(solution)
         edges = solution.edges(keys=True, data=True)
         for u, v, k, data in edges:
