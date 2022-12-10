@@ -40,9 +40,15 @@ class TabuSearch:
     # Acelerar com paralelismo:
     def obj_function_radom(self, solution, num_tests=100, attempt_limit=10000) -> float:
         node_list = list(solution.nodes)
-        already_tested = []
-        length = len(node_list)
-        randint_length = length - 1
+        pairs = []
+        start = time.time()
+        for node1 in node_list:
+            for node2 in node_list:
+                if nx.has_path(solution, node1, node2):
+                    pairs.append((node1, node2))
+        end = time.time()
+        print(end - start)
+        length = len(pairs)
 
         t_routes = 0
         t_time = 0
@@ -50,20 +56,15 @@ class TabuSearch:
         while attempt_limit > 0:
             attempt_limit -= 1
 
-            origin = node_list[randint(0, randint_length)]
-            dest = node_list[randint(0, randint_length)]
-            already_tested.append((origin, dest))
-            print(f' {origin} , {dest}')
+            origin, dest = pairs.pop(randint(0, len(pairs) - 1))
 
-            if origin == dest or not nx.has_path(solution, origin, dest) or (origin, dest) in already_tested:
+            if origin == dest:
                 continue
-
-            print(origin)
-            print(dest)
 
             shortest_path_length = nx.shortest_path_length(solution, origin, dest,
                                                            weight='travel_time')
-            if shortest_path_length != 0 and shortest_path_length != None:
+
+            if shortest_path_length != 0:
                 t_time += shortest_path_length
                 t_routes += 1
 
