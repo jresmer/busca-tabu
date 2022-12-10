@@ -41,14 +41,10 @@ class TabuSearch:
     def obj_function_radom(self, solution, num_tests=100, attempt_limit=10000) -> float:
         node_list = list(solution.nodes)
         pairs = []
-        start = time.time()
         for node1 in node_list:
             for node2 in node_list:
                 if nx.has_path(solution, node1, node2):
                     pairs.append((node1, node2))
-        end = time.time()
-        print(end - start)
-        length = len(pairs)
 
         t_routes = 0
         t_time = 0
