@@ -1,5 +1,6 @@
 import osmnx as ox
 import copy
+from random import choice
 from tabuList import TabuList
 from pprint import pprint
 from objFuncCalculator import ObjFuncCalculator
@@ -96,6 +97,27 @@ class Neighbourhood(metaclass=SingletonMeta):
             if neighbour not in tabu_list:
                 self.__neighbourhood.append(neighbour)
 
+    def generate_neighbourhood_random(self, solution, num_it=50, tabu_list=TabuList(), max_bool=False):
+        solution = ox.add_edge_travel_times(solution)
+        edges = [e for e in solution.edges]
+        for _ in range(num_it):
+            u, v, k = choice(edges)
+            # add a lane:
+            neighbour = self.add_lane(solution, max_bool, u, v, k)
+            # add to neighbourhood:
+            if neighbour not in tabu_list:
+                self.__neighbourhood.append(neighbour)
+            # remove a lane:
+            neighbour = self.remove_lane(solution, max_bool, u, v, k)
+            # add to neighbourhood:
+            if neighbour not in tabu_list:
+                self.__neighbourhood.append(neighbour)
+            # reverse lane:
+            neighbour = self.reverse_lane_(solution, u, v, k)
+            # add to neighbourhood:
+            if neighbour not in tabu_list:
+                self.__neighbourhood.append(neighbour)
+
     def get_best_neighbour(self, solution, tabu_list=TabuList(), max_bool=False):
         solution = ox.add_edge_travel_times(solution)
         edges = solution.edges(keys=True, data=True)
@@ -108,13 +130,47 @@ class Neighbourhood(metaclass=SingletonMeta):
             # add a lane:
             neighbour = self.add_lane(solution, max_bool, u, v, k)
             if neighbour not in tabu_list:
-                dictio[self.__obj_calculator.obj_func_radom(neighbour)] = neighbour
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour
             # remove a lane:
             if neighbour not in tabu_list:
-                dictio[self.__obj_calculator.obj_func_radom(neighbour)] = neighbour
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour
             # reverse lane:
             if neighbour not in tabu_list:
-                dictio[self.__obj_calculator.obj_func_radom(neighbour)] = neighbour
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour
+
+            if len(dictio) == 0:
+                continue
+
+            neighbour_list = list(dictio.keys())
+            neighbour_list.sort()
+            obj_value = neighbour_list[0]
+
+            if obj_value <= obj_func_value:
+                obj_func_value = obj_value
+                best_neighbour = dictio[obj_value]
+
+        return best_neighbour
+
+    def get_best_neighbour_random(self, solution, num_it=50, tabu_list=TabuList(), max_bool=False):
+        solution = ox.add_edge_travel_times(solution)
+        edges = [e for e in solution.edges]
+
+        best_neighbour = None
+        obj_func_value = 10000
+
+        for _ in range(num_it):
+            u, v, k = choice(edges)
+            dictio = {}
+            # add a lane:
+            neighbour = self.add_lane(solution, max_bool, u, v, k)
+            if neighbour not in tabu_list:
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour
+            # remove a lane:
+            if neighbour not in tabu_list:
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour
+            # reverse lane:
+            if neighbour not in tabu_list:
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour
 
             if len(dictio) == 0:
                 continue
