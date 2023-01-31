@@ -1,26 +1,30 @@
-from random import randint
+from random import choice
 import networkx as nx
 
 
 class ObjFuncCalculator:
 
-    def obj_func_radom(self, solution, num_tests=100, attempt_limit=10000) -> float:
+    def obj_func_random(self, solution, num_tests=100, attempt_limit=10000) -> float:
         node_list = list(solution.nodes)
-        pairs = []
-        for node1 in node_list:
-            for node2 in node_list:
-                if nx.has_path(solution, node1, node2):
-                    pairs.append((node1, node2))
+        self.pair_list = []
 
         t_routes = 0
         t_time = 0
 
         while attempt_limit > 0:
-            attempt_limit -= 1
+            length = len(node_list) - 1
+            if length == -1:
+                break
 
-            origin, dest = pairs.pop(randint(0, len(pairs) - 1))
+            origin = choice(node_list)
+            dest = choice(node_list)
 
-            if origin == dest:
+            if origin == dest or (origin, dest) in self.pair_list:
+                continue
+
+            self.pair_list.append((origin, dest))
+
+            if not nx.has_path(solution, origin, dest):
                 continue
 
             shortest_path_length = nx.shortest_path_length(solution, origin, dest,
@@ -34,6 +38,5 @@ class ObjFuncCalculator:
                 break
 
         if t_routes > 0:
-            print(f"Number of paths tested : {t_routes}")
             return t_time / t_routes
         return 0
