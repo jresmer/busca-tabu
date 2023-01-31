@@ -11,7 +11,7 @@ class TabuSearch:
 
         self.s = self.get_first_solution(dist, steps)
         self.best_solution = self.s
-        self.opt_value = self.__obj_calculator.obj_func_radom(self.s)
+        self.opt_value = self.__obj_calculator.obj_func_random(self.s)
         self.tabu_list = TabuList()
 
     # Escolher um vizinho aleatorio
@@ -29,9 +29,9 @@ class TabuSearch:
             for _ in range(steps):
                 nd = Neighbourhood()
                 nd.generate_neighbourhood(s)
-                value = self.__obj_calculator.obj_func_radom(s)
+                value = self.__obj_calculator.obj_func_random(s)
                 for _s in nd.neighbourhood:
-                    _value = self.__obj_calculator.obj_func_radom(_s)
+                    _value = self.__obj_calculator.obj_func_random(_s)
                     if _value < value:
                         s = _s
                         value = _value
@@ -43,10 +43,10 @@ class TabuSearch:
             nd = Neighbourhood()
             nd.generate_neighbourhood(self.s, self.tabu_list)
             opt_nb = nd.neighbourhood[0]
-            value = self.__obj_calculator.obj_func_radom(opt_nb)
+            value = self.__obj_calculator.obj_func_random(opt_nb)
 
             for _s in nd.neighbourhood:
-                _value = self.__obj_calculator.obj_func_radom(_s)
+                _value = self.__obj_calculator.obj_func_random(_s)
                 if _s not in self.tabu_list and _value != 0 and _value < value:
                     value = _value
                     opt_nb = _s
