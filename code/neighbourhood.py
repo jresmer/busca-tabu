@@ -98,6 +98,7 @@ class Neighbourhood(metaclass=SingletonMeta):
                 self.__neighbourhood.append(neighbour)
 
     def generate_neighbourhood_random(self, solution, num_it=50, tabu_list=TabuList(), max_bool=False):
+        self.__neighbourhood = []
         solution = ox.add_edge_travel_times(solution)
         edges = [e for e in solution.edges]
         for _ in range(num_it):
@@ -183,4 +184,4 @@ class Neighbourhood(metaclass=SingletonMeta):
                 obj_func_value = obj_value
                 best_neighbour = dictio[obj_value]
 
-        return best_neighbour
+        return best_neighbour, obj_func_value
