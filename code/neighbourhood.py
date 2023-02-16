@@ -165,13 +165,13 @@ class Neighbourhood(metaclass=SingletonMeta):
             # add a lane:
             neighbour = self.add_lane(solution, max_bool, u, v, k)
             if neighbour not in tabu_list:
-                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane added at {(u, v, k)}'
             # remove a lane:
             if neighbour not in tabu_list:
-                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane removed at {(u, v, k)}'
             # reverse lane:
             if neighbour not in tabu_list:
-                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane reversed at {(u, v, k)}'
 
             if len(dictio) == 0:
                 continue
@@ -182,6 +182,9 @@ class Neighbourhood(metaclass=SingletonMeta):
 
             if obj_value <= obj_func_value:
                 obj_func_value = obj_value
-                best_neighbour = dictio[obj_value]
-
+                best_neighbour, log_text = dictio[obj_value]
+                log_text = "\n" + f'{log_text}' + "\n" + "\n"
+                f = open('log.txt', 'w')
+                f.write(log_text)
+                f.close()
         return best_neighbour, obj_func_value
