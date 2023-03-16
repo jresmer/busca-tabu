@@ -4,6 +4,7 @@ from random import choice
 from tabuList import TabuList
 from pprint import pprint
 from objFuncCalculator import ObjFuncCalculator
+from logManager import LogManager
 
 
 class SingletonMeta(type):
@@ -152,7 +153,7 @@ class Neighbourhood(metaclass=SingletonMeta):
 
         return best_neighbour
 
-    def get_best_neighbour_random(self, solution, num_it=50, tabu_list=TabuList(), max_bool=False):
+    def get_best_neighbour_random(self, solution, num_it=50, tabu_list=TabuList(), max_bool=False, budget=10000):
         solution = ox.add_edge_travel_times(solution)
         edges = [e for e in solution.edges]
 
@@ -165,13 +166,13 @@ class Neighbourhood(metaclass=SingletonMeta):
             # add a lane:
             neighbour = self.add_lane(solution, max_bool, u, v, k)
             if neighbour not in tabu_list:
-                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane added at {(u, v, k)}'
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane added at {(u, v, k)}', 1500
             # remove a lane:
             if neighbour not in tabu_list:
-                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane removed at {(u, v, k)}'
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane removed at {(u, v, k)}', 1000
             # reverse lane:
             if neighbour not in tabu_list:
-                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane reversed at {(u, v, k)}'
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane reversed at {(u, v, k)}', 500
 
             if len(dictio) == 0:
                 continue
@@ -182,9 +183,12 @@ class Neighbourhood(metaclass=SingletonMeta):
 
             if obj_value <= obj_func_value:
                 obj_func_value = obj_value
-                best_neighbour, log_text = dictio[obj_value]
+                best_neighbour, log_text, cost = dictio[obj_value]
                 log_text = "\n" + f'{log_text}' + "\n" + "\n"
-                f = open('log.txt', 'w')
-                f.write(log_text)
-                f.close()
+                LogManager().write_on_log(log_text, best_neighbour.number_of_nodes())
+                budget -= cost
+
+            if budget <= 0:
+                break
+
         return best_neighbour, obj_func_value
