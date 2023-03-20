@@ -1,52 +1,52 @@
 from neighbourhood import Neighbourhood
-# from pprint import pprint
 from tabuList import TabuList
-from random import randint
 from objFuncCalculator import ObjFuncCalculator
+from interfaceManager import InterfaceManager
 import osmnx as ox
 
+
 class TabuSearch:
-    def __init__(self, dist, steps=50):
+    def __init__(self):
         self.__obj_calculator = ObjFuncCalculator()
         self.__nd = Neighbourhood()
-        self.s = self.get_first_solution(dist, steps)
-        self.best_solution = self.s
-        self.opt_value = self.__obj_calculator.obj_func_random(self.s)
-        self.tabu_list = TabuList()
+        self.__s = None
+        self.__opt_value = None
+        self.__tabu_list = TabuList()
+        self.__interface = InterfaceManager()
 
-    # Escolher um vizinho aleatorio
-    def get_first_solution(self, dist, steps, random=True):
-        graph = ox.graph_from_address('350 5th Ave, New York, New York', network_type='drive', dist=dist)
+        self.__address_list = []
+
+    def set_first_solution(self, address_sel, dist, steps):
+        graph = ox.graph_from_address(self.__address_list[address_sel], network_type='drive', dist=dist)
         _graph = ox.project_graph(graph)
         __graph = ox.utils_graph.get_largest_component(_graph, strongly=True)
         s = __graph
-        if random:
-            for _ in range(steps):
-                nd = Neighbourhood()
-                nd.generate_neighbourhood(s)
-                s = nd.neighbourhood[randint(0, len(nd.neighbourhood))]
-        else:
-            for _ in range(steps):
-                nd = Neighbourhood()
-                nd.generate_neighbourhood(s)
-                value = self.__obj_calculator.obj_func_random(s)
-                for _s in nd.neighbourhood:
-                    _value = self.__obj_calculator.obj_func_random(_s)
-                    if _value < value:
-                        s = _s
-                        value = _value
-        return s
+        for _ in range(steps):
+            s = Neighbourhood().random_neighbour(s)
 
-    # Terminar get_best_neighbour para substituir generate_neighbourhood:
-    def loop(self, itr=50):
-        for _ in range(itr):
-            best_neighbour, best_neighbours_value = self.__nd.get_best_neighbour(self.s, self.tabu_list)
-            if best_neighbours_value < self.opt_value:
-                self.opt_value = best_neighbours_value
-                self.s = best_neighbour
+        self.__s = s
+        self.__opt_value = self.__obj_calculator.obj_func_random(s)
+
+    def loop(self, budget, max_bool, steps):
+        while budget > 0:
+            best_neighbour, \
+                best_neighbours_value, cost = self.__nd.get_best_neighbour_random(self.__s,
+                                                                                  budget, max_bool, steps,
+                                                                                  tabu_list=self.__tabu_list)
+            if best_neighbours_value < self.__opt_value:
+                self.__opt_value = best_neighbours_value
+                self.__s = best_neighbour
+                budget -= cost
             else:
-                print("No neighbour satisfied the criteria")
+                # log message
                 break
 
     def get_best_solution(self):
-        return self.s
+        return self.__s
+
+    def run(self):
+        address_sel, dist, steps, budget, max_bool = self.__interface.address_selection(self.__address_list)
+        self.set_first_solution(address_sel, dist, steps)
+        self.loop(budget, max_bool, steps)
+
+        return self.get_best_solution()
