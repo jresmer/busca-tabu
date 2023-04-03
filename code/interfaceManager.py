@@ -8,10 +8,11 @@ class InterfaceManager(metaclass=SingletonMeta):
             msg = f"""
         {_list}
         Selecione um endereço da lista para o teste:
-        
+
         """
             sel = input(msg)
-            if 0 <= int(sel) < len(_list):
+            sel = int(sel)
+            if not 0 <= sel < len(_list):
                 print("Valor inválido")
                 continue
 
@@ -45,19 +46,7 @@ class InterfaceManager(metaclass=SingletonMeta):
                 print("O valor deve ser um inteiro")
                 continue
 
-            msg = """
-            :
-            """
-            max_bool = input(msg)
-            if max_bool == '1':
-                max_bool = True
-            elif max_bool == '0':
-                max_bool = False
-            else:
-                print("O valor deva ser um inteiro do intervalo [0, 1]")
-                continue
-
-            return sel, radius, steps, budget, max_bool
+            return sel, radius, steps, budget
 
     def quit(self):
         msg = """
