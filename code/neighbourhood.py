@@ -11,24 +11,22 @@ from singletonMeta import SingletonMeta
 class Neighbourhood(metaclass=SingletonMeta):
 
     def __init__(self):
-        self.__neighbourhood = []
         self.__obj_calculator = ObjFuncCalculator()
-        self.__operations = {'add': self.add_lane, 'remove': self.remove_lane, 'reverse': self.reverse_lane}
-
-    @property
-    def neighbourhood(self):
-        return self.__neighbourhood
+        self.__log = LogManager()
+        self.__operations = {'add': self.__add_lane, 'remove': self.__remove_lane, 'reverse': self.__reverse_lane}
 
     @staticmethod
-    def add_lane(solution, u, v, k, max_bool):
+    def __add_lane(solution, u, v, k, max_bool):
         neighbour = copy.deepcopy(solution)
-        edge = neighbour.edges[(u, v, k)]
+        edge = solution.edges[(u, v, k)]
         lanes = edge['lanes'] if 'lanes' in edge else '1'
         try:
-            if max_bool:
-                edge['lanes'] = str(int(max(lanes) + 1))
+            if isinstance(lanes, str):
+                edge['lanes'] = str(int(lanes) - 1)
+            elif max_bool:
+                edge['lanes'] = str(int(max(lanes)) + 1)
             else:
-                edge['lanes'] = str(int(min(lanes) + 1))
+                edge['lanes'] = str(int(min(lanes)) + 1)
         except Exception as e:
             pprint(e)
         neighbour[u][v][k]['lanes'] = edge['lanes']
@@ -36,13 +34,17 @@ class Neighbourhood(metaclass=SingletonMeta):
         return neighbour
 
     @staticmethod
-    def remove_lane(solution, u, v, k, max_bool):
+    def __remove_lane(solution, u, v, k, max_bool):
         neighbour = copy.deepcopy(solution)
-        edge = neighbour.edges[(u, v, k)]
+        edge = solution.edges[(u, v, k)]
+        if 'lanes' not in edge:
+            return neighbour
         lanes = edge['lanes']
         if lanes != '1':
             try:
-                if max_bool:
+                if isinstance(lanes, str):
+                    edge['lanes'] = str(int(lanes) - 1)
+                elif max_bool:
                     edge['lanes'] = str(int(max(lanes)) - 1)
                 else:
                     edge['lanes'] = str(int(min(lanes)) - 1)
@@ -53,10 +55,13 @@ class Neighbourhood(metaclass=SingletonMeta):
         return neighbour
 
     @staticmethod
-    def reverse_lane(solution, u, v, k):
+    def __reverse_lane(solution, u, v, k):
         neighbour = copy.deepcopy(solution)
-        edge = neighbour.edges[(u, v, k)]
-        if len(edge['lanes']) == 1:
+        edge = solution.edges[(u, v, k)]
+        if 'lanes' not in edge:
+            return neighbour
+        lanes = edge['lanes']
+        if isinstance(lanes, str) or len(lanes) == 1:
             try:
                 attrs = neighbour[u][v][k]
                 neighbour.remove_edge(u, v, k)
@@ -65,31 +70,37 @@ class Neighbourhood(metaclass=SingletonMeta):
                     neighbour[v][u][k][key] = attrs[key]
             except Exception as e:
                 pprint(e)
-        elif len(edge['lanes']) == 2:
+        elif len(lanes) == 2:
             edge["lanes"][0] = int(edge["lanes"][0]) - 1
             edge["lanes"][1] = int(edge["lanes"][1]) + 1
             neighbour[u][v][k]['lanes'] = edge['lanes']
         return neighbour
 
-    def get_best_neighbour_random(self, solution, budget_left, max_bool, num_it, tabu_list=TabuList()):
+    def get_best_neighbour_random(self, solution, budget_left, max_bool, tabu_list=TabuList()):
         solution = ox.add_edge_travel_times(solution)
         edges = [e for e in solution.edges]
 
-        best_neighbour = None
+        best_neighbour = solution
         obj_func_value = 10000
         log_text = ''
+        cost = 0
 
-        for _ in range(num_it):
+        itr = len(edges) // 10
+
+        for _ in range(itr):
             u, v, k = choice(edges)
+            edges.remove((u, v, k))
             dictio = {}
             # add a lane:
-            neighbour = self.add_lane(solution, max_bool, u, v, k)
+            neighbour = self.__add_lane(solution, u, v, k, max_bool)
             if neighbour not in tabu_list:
                 dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane added at {(u, v, k)}', 1500
             # remove a lane:
+            neighbour = self.__remove_lane(solution, u, v, k, max_bool)
             if neighbour not in tabu_list:
                 dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane removed at {(u, v, k)}', 1000
             # reverse lane:
+            neighbour = self.__reverse_lane(solution, u, v, k)
             if neighbour not in tabu_list:
                 dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane reversed at {(u, v, k)}', 500
 
@@ -104,20 +115,22 @@ class Neighbourhood(metaclass=SingletonMeta):
             if obj_value <= obj_func_value and budget_left - cost > 0:
                 obj_func_value = obj_value
                 best_neighbour = _best_neighbour
-                log_text = "\n" + f'{log_text}' + "\n" + "\n"
 
-        LogManager().write_on_log(log_text, best_neighbour.number_of_nodes())
+        self.__log.write_on_log(log_text, best_neighbour.number_of_nodes())
 
         return best_neighbour, obj_func_value, cost
 
     def random_neighbour(self, solution, max_bool=False):
+        solution = ox.add_edge_speeds(solution)
         solution = ox.add_edge_travel_times(solution)
-        edges = [e for e in solution.edges]
+        edges = [e for e in solution.edges.keys()]
         u, v, k = choice(edges)
         _operation = choice(list(self.__operations.keys()))
         if _operation == 'reverse':
             solution = self.__operations[_operation](solution, u, v, k)
         else:
             solution = self.__operations[_operation](solution, u, v, k, max_bool)
+
+        self.__log.write_on_log(f'{_operation} at {(u, v, k)}', solution.number_of_nodes(), first_solution=True)
 
         return solution
