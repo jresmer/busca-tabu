@@ -112,7 +112,7 @@ class Neighbourhood(metaclass=SingletonMeta):
                 obj_func_value = obj_value
                 best_neighbour = _best_neighbour
 
-        self.__log.write_on_log(log_text, best_neighbour.number_of_nodes())
+        self.__log.write_on_log(log_text, best_neighbour.number_of_nodes(), obj_func_value)
 
         return best_neighbour, obj_func_value, cost
 
@@ -127,6 +127,7 @@ class Neighbourhood(metaclass=SingletonMeta):
         else:
             solution = self.__operations[_operation](solution, u, v, k, max_bool)
 
-        self.__log.write_on_log(f'{_operation} at {(u, v, k)}', solution.number_of_nodes(), first_solution=True)
+        self.__log.write_on_log(f'{_operation} at {(u, v, k)}', solution.number_of_nodes(),
+                                self.__obj_calculator.obj_func_random(solution))
 
         return solution
