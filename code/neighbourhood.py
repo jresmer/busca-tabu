@@ -12,8 +12,12 @@ class Neighbourhood(metaclass=SingletonMeta):
 
     def __init__(self):
         self.__obj_calculator = ObjFuncCalculator()
-        self.__log = LogManager()
+        self.__log = None
         self.__operations = {'add': self.__add_lane, 'remove': self.__remove_lane, 'reverse': self.__reverse_lane}
+
+    def set_log(self, log_manager):
+        if isinstance(log_manager, LogManager):
+            self.__log = log_manager
 
     @staticmethod
     def __add_lane(solution, u, v, k, max_bool):
