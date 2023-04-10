@@ -22,7 +22,7 @@ class InterfaceManager(metaclass=SingletonMeta):
             radius = input(msg)
             try:
                 radius = int(radius)
-            except:
+            except ValueError:
                 print("O valor deve ser um inteiro")
                 continue
 
@@ -32,7 +32,7 @@ class InterfaceManager(metaclass=SingletonMeta):
             steps = input(msg)
             try:
                 steps = int(steps)
-            except:
+            except ValueError:
                 print("O valor deve ser um inteiro")
                 continue
 
@@ -42,11 +42,22 @@ class InterfaceManager(metaclass=SingletonMeta):
             budget = input(msg)
             try:
                 budget = int(budget)
-            except:
+            except ValueError:
                 print("O valor deve ser um inteiro")
                 continue
 
-            return sel, radius, steps, budget
+
+            msg = """
+                Digite o valor percentual minimo da próxima solução para que a busca continue:
+                """
+            perc = input(msg)
+            try:
+                perc = int(perc)
+            except ValueError:
+                print("O valor deve ser um inteiro")
+                continue
+
+            return sel, radius, steps, budget, perc
 
     def quit(self):
         msg = """
