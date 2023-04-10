@@ -19,7 +19,7 @@ class Neighbourhood(metaclass=SingletonMeta):
     def __add_lane(solution, u, v, k, max_bool):
         neighbour = copy.deepcopy(solution)
         edge = solution.edges[(u, v, k)]
-        lanes = edge['lanes'] if 'lanes' in edge else '1'
+        lanes = edge['lanes'] if 'lanes' in edge else ['1', '1']
         try:
             if isinstance(lanes, str):
                 edge['lanes'] = str(int(lanes) - 1)
@@ -37,9 +37,7 @@ class Neighbourhood(metaclass=SingletonMeta):
     def __remove_lane(solution, u, v, k, max_bool):
         neighbour = copy.deepcopy(solution)
         edge = solution.edges[(u, v, k)]
-        if 'lanes' not in edge:
-            return neighbour
-        lanes = edge['lanes']
+        lanes = edge['lanes'] if 'lanes' in edge else ['1', '1']
         if lanes != '1':
             try:
                 if isinstance(lanes, str):
@@ -58,9 +56,7 @@ class Neighbourhood(metaclass=SingletonMeta):
     def __reverse_lane(solution, u, v, k):
         neighbour = copy.deepcopy(solution)
         edge = solution.edges[(u, v, k)]
-        if 'lanes' not in edge:
-            return neighbour
-        lanes = edge['lanes']
+        lanes = edge['lanes'] if 'lanes' in edge else ['1', '1']
         if isinstance(lanes, str) or len(lanes) == 1:
             try:
                 attrs = neighbour[u][v][k]
