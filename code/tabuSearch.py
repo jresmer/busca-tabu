@@ -71,6 +71,7 @@ class TabuSearch:
     def run(self):
         address_sel, dist, steps, budget, perc = self.__interface.address_selection(self.__address_list)
         self.__log = LogManager(steps)
+        self.__nd.set_log(self.__log)
         self.__set_first_solution(address_sel, dist, steps, perc)
         self.__loop(budget)
         self.__log.quit()
