@@ -85,7 +85,7 @@ class Neighbourhood(metaclass=SingletonMeta):
         obj_func_value = 10000
         log_text = ''
         cost = 0
-        reverse_op = ''
+        reverse_op = None
 
         itr = len(edges) // 10
 
@@ -114,7 +114,7 @@ class Neighbourhood(metaclass=SingletonMeta):
             for i in range(3):
                 neighbour_list = list(dictio.keys())
                 neighbour_list.sort()
-                obj_value = neighbour_list[0]
+                obj_value = neighbour_list[i]
                 _best_neighbour, log_text, cost, reverse_op = dictio[obj_value]
                 print(reverse_op)
 
