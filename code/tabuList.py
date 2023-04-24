@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from networkx import graph_edit_distance
 
 
 class TabuList:
@@ -13,14 +12,11 @@ class TabuList:
 
     # MAGIC METHOD CHECAGEM IN
     def __contains__(self, item):
-        for _solution in self.__list:
-            if graph_edit_distance(item, _solution) == 0:
-                return True
-        return False
+        return item in self
 
     # ADICIONA E REMOVE SOLUCOES TABU
     def update(self, item=None):
-        if item is not None:
+        if item is not None and item not in TabuList:
             self.__list.append(item)
         self.__iteration_counter -= 1
         if self.__iteration_counter < 1:
