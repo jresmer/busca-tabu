@@ -1,6 +1,6 @@
-from tabuSearch import TabuSearch
+from tester import Tester
 
 
 if __name__ == "__main__":
-    tabu_search = TabuSearch()
-    tabu_search.run()
+    tester = Tester()
+    tester.run_test()
