@@ -85,7 +85,7 @@ class Neighbourhood(metaclass=SingletonMeta):
         obj_func_value = 10000
         log_text = ''
         cost = 0
-        reverse_op = None
+        reverse_op = ''
 
         itr = len(edges) // 10
 
@@ -116,6 +116,7 @@ class Neighbourhood(metaclass=SingletonMeta):
                 neighbour_list.sort()
                 obj_value = neighbour_list[0]
                 _best_neighbour, log_text, cost, reverse_op = dictio[obj_value]
+                print(reverse_op)
 
                 if log_text not in self.__tabu_list and obj_value <= obj_func_value and budget_left - cost > 0:
                     obj_func_value = obj_value
