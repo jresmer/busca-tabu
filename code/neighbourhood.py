@@ -102,7 +102,7 @@ class Neighbourhood(metaclass=SingletonMeta):
             neighbour = self.__remove_lane(solution, u, v, k, max_bool)
             if neighbour not in self.__tabu_list:
                 dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour,\
-                    f'lane removed at {(u, v, k)}', 1000,  f'lane add at {(u, v, k)}'
+                    f'lane removed at {(u, v, k)}', 1000,  f'lane added at {(u, v, k)}'
             # reverse lane:
             neighbour = self.__reverse_lane(solution, u, v, k)
             if neighbour not in self.__tabu_list:
