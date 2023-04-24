@@ -12,7 +12,7 @@ class TabuList:
 
     # MAGIC METHOD CHECAGEM IN
     def __contains__(self, item):
-        return item in self
+        return item in self.__list
 
     # ADICIONA E REMOVE SOLUCOES TABU
     def update(self, item=None):
