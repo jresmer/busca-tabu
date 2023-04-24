@@ -10,6 +10,7 @@ class TabuSearch:
     def __init__(self):
         self.__obj_calculator = ObjFuncCalculator()
         self.__nd = Neighbourhood()
+        self.__log = None
 
         self.__best_s = None
         self.__best_s_value = None
@@ -17,8 +18,6 @@ class TabuSearch:
 
         self.__s = None
         self.__opt_value = None
-        self.__opt_value_5 = None
-        self.__tabu_list = TabuList()
         self.__interface = InterfaceManager()
 
         self.__address_list = ['Rua Roberto Sampaio Gonzaga, Florianópolis, Brazil', 'São Paulo, Brazil', 'Balneário Camboriú, Brazil', '350 5th Ave, New York, New York']
@@ -46,11 +45,8 @@ class TabuSearch:
             max_bool = not max_bool
             best_neighbour, \
                 best_neighbours_value, cost = self.__nd.get_best_neighbour_random(self.__s,
-                                                                                  budget, max_bool,
-                                                                                  tabu_list=self.__tabu_list)
-            if best_neighbours_value not in self.__tabu_list and \
-                    best_neighbours_value - self.__opt_value < self.__opt_value_5:
-                self.__tabu_list.update(best_neighbour)
+                                                                                  budget, max_bool)
+            if best_neighbours_value - self.__opt_value < self.__opt_value_5:
                 self.__opt_value = best_neighbours_value
                 self.__opt_value_5 = best_neighbours_value * (self.__perc / 100)
                 self.__s = best_neighbour
@@ -68,9 +64,10 @@ class TabuSearch:
     def get_best_solutions_value(self):
         return self.__best_s_value
 
-    def run(self):
-        address_sel, dist, steps, budget, perc = self.__interface.address_selection(self.__address_list)
-        self.__log = LogManager(steps)
+    def run(self, address_sel=None, dist=None, steps=None, budget=None, perc=None):
+        if address_sel is None:
+            address_sel, dist, steps, budget, perc = self.__interface.address_selection(self.__address_list)
+        self.__log = LogManager(steps, self.__address_list[address_sel], dist, budget, perc)
         self.__nd.set_log(self.__log)
         self.__set_first_solution(address_sel, dist, steps, perc)
         self.__loop(budget)
