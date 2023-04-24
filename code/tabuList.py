@@ -16,7 +16,7 @@ class TabuList:
 
     # ADICIONA E REMOVE SOLUCOES TABU
     def update(self, item=None):
-        if isinstance(item, str) and item not in TabuList:
+        if item is not None and item not in self.__list:
             self.__list.append(item)
         self.__iteration_counter -= 1
         if self.__iteration_counter < 1:
