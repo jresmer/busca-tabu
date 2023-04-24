@@ -62,7 +62,7 @@ class Neighbourhood(metaclass=SingletonMeta):
         neighbour = copy.deepcopy(solution)
         edge = solution.edges[(u, v, k)]
         lanes = edge['lanes'] if 'lanes' in edge else ['1', '1']
-        if isinstance(lanes, str) or len(lanes) == 1:
+        if isinstance(lanes, str) or 'lanes' not in edge:
             try:
                 attrs = neighbour[u][v][k]
                 neighbour.remove_edge(u, v, k)
