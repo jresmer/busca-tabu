@@ -3,12 +3,19 @@ from datetime import datetime
 
 class LogManager:
 
-    def __init__(self, steps):
+    def __init__(self, steps, address, dist, budget, perc):
         self.__start_time = datetime.now()
         self.__counter = 0
         self.__steps_for_first_solution = steps
-        self.__log_name = f'log-d:{datetime.now()}.txt'
-        log_text = f'Time: {self.__start_time}'
+
+        city = address.split(", ")
+        city = city[1]
+        self.__log_name = f'log-{city}.txt'
+        log_text = f"""Time: {self.__start_time}
+Address: {address}
+Radius: {dist}
+Budget: {budget}
+Tolerance Percentage: {perc}"""
         f = open(self.__log_name, 'a')
         f.write(log_text)
         f.close()
