@@ -10,8 +10,9 @@ from singletonMeta import SingletonMeta
 
 class Neighbourhood(metaclass=SingletonMeta):
 
-    def __init__(self):
+    def __init__(self, tabu_list=TabuList()):
         self.__obj_calculator = ObjFuncCalculator()
+        self.__tabu_list = tabu_list
         self.__log = None
         self.__operations = {'add': self.__add_lane, 'remove': self.__remove_lane, 'reverse': self.__reverse_lane}
 
@@ -76,7 +77,7 @@ class Neighbourhood(metaclass=SingletonMeta):
             neighbour[u][v][k]['lanes'] = edge['lanes']
         return neighbour
 
-    def get_best_neighbour_random(self, solution, budget_left, max_bool, tabu_list=TabuList()):
+    def get_best_neighbour_random(self, solution, budget_left, max_bool):
         solution = ox.add_edge_travel_times(solution)
         edges = [e for e in solution.edges]
 
@@ -84,6 +85,7 @@ class Neighbourhood(metaclass=SingletonMeta):
         obj_func_value = 10000
         log_text = ''
         cost = 0
+        reverse_op = None
 
         itr = len(edges) // 10
 
@@ -93,30 +95,35 @@ class Neighbourhood(metaclass=SingletonMeta):
             dictio = {}
             # add a lane:
             neighbour = self.__add_lane(solution, u, v, k, max_bool)
-            if neighbour not in tabu_list:
-                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane added at {(u, v, k)}', 1500
+            if neighbour not in self.__tabu_list:
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour,\
+                    f'lane added at {(u, v, k)}', 1500, f'lane removed at {(u, v, k)}'
             # remove a lane:
             neighbour = self.__remove_lane(solution, u, v, k, max_bool)
-            if neighbour not in tabu_list:
-                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane removed at {(u, v, k)}', 1000
+            if neighbour not in self.__tabu_list:
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour,\
+                    f'lane removed at {(u, v, k)}', 1000,  f'lane add at {(u, v, k)}'
             # reverse lane:
             neighbour = self.__reverse_lane(solution, u, v, k)
-            if neighbour not in tabu_list:
-                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour, f'lane reversed at {(u, v, k)}', 500
+            if neighbour not in self.__tabu_list:
+                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour,\
+                    f'lane reversed at {(u, v, k)}', 500, f'lane reversed at {(u, v, k)}'
 
             if len(dictio) == 0:
                 continue
+            for i in range(3):
+                neighbour_list = list(dictio.keys())
+                neighbour_list.sort()
+                obj_value = neighbour_list[0]
+                _best_neighbour, log_text, cost, reverse_op = dictio[obj_value]
 
-            neighbour_list = list(dictio.keys())
-            neighbour_list.sort()
-            obj_value = neighbour_list[0]
-            _best_neighbour, log_text, cost = dictio[obj_value]
-
-            if obj_value <= obj_func_value and budget_left - cost > 0:
-                obj_func_value = obj_value
-                best_neighbour = _best_neighbour
+                if log_text not in self.__tabu_list and obj_value <= obj_func_value and budget_left - cost > 0:
+                    obj_func_value = obj_value
+                    best_neighbour = _best_neighbour
+                    break
 
         self.__log.write_on_log(log_text, best_neighbour.number_of_nodes(), obj_func_value)
+        self.__tabu_list.update(reverse_op)
 
         return best_neighbour, obj_func_value, cost
 
