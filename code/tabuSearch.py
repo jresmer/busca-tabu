@@ -72,5 +72,3 @@ class TabuSearch:
         self.__set_first_solution(address_sel, dist, steps, perc)
         self.__loop(budget)
         self.__log.quit()
-
-        ox.plot_graph(self.get_best_solution())
