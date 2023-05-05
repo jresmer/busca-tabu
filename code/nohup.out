@@ -1,0 +1,64 @@
+Traceback (most recent call last):
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/main.py", line 6, in <module>
+    tester.run_test()
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/tester.py", line 14, in run_test
+    tabu_search.run(address_sel, dist, steps, budget, perc)
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/tabuSearch.py", line 72, in run
+    self.__set_first_solution(address_sel, dist, steps, perc)
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/tabuSearch.py", line 29, in __set_first_solution
+    _graph = ox.project_graph(graph)
+  File "/home/joaoresmer/.local/lib/python3.10/site-packages/osmnx/projection.py", line 144, in project_graph
+    gdf_nodes = utils_graph.graph_to_gdfs(G, edges=False)
+  File "/home/joaoresmer/.local/lib/python3.10/site-packages/osmnx/utils_graph.py", line 54, in graph_to_gdfs
+    gdf_nodes = gpd.GeoDataFrame(data, index=nodes, crs=crs, geometry=list(geom))
+  File "/home/joaoresmer/.local/lib/python3.10/site-packages/geopandas/geodataframe.py", line 188, in __init__
+    self.set_geometry(geometry, inplace=True, crs=crs)
+  File "/home/joaoresmer/.local/lib/python3.10/site-packages/geopandas/geodataframe.py", line 347, in set_geometry
+    frame[geo_column_name] = level
+  File "/home/joaoresmer/.local/lib/python3.10/site-packages/geopandas/geodataframe.py", line 1439, in __setitem__
+    crs = getattr(self, "crs", None)
+  File "/home/joaoresmer/.local/lib/python3.10/site-packages/geopandas/geodataframe.py", line 431, in crs
+    return self.geometry.crs
+  File "/home/joaoresmer/.local/lib/python3.10/site-packages/geopandas/geodataframe.py", line 217, in _get_geometry
+    geo_cols = list(self.columns[self.dtypes == "geometry"])
+  File "/home/joaoresmer/.local/lib/python3.10/site-packages/pandas/core/generic.py", line 6159, in dtypes
+    return self._constructor_sliced(data, index=self._info_axis, dtype=np.object_)
+  File "/home/joaoresmer/.local/lib/python3.10/site-packages/geopandas/geodataframe.py", line 1534, in _geodataframe_constructor_sliced
+    srs = pd.Series(*args, **kwargs)
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/main.py", line 6, in <module>
+    tester.run_test()
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/tester.py", line 14, in run_test
+    tabu_search.run(address_sel, dist, steps, budget, perc)
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/tabuSearch.py", line 73, in run
+    self.__loop(budget)
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/tabuSearch.py", line 47, in __loop
+    best_neighbours_value, cost = self.__nd.get_best_neighbour_random(self.__s,
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/neighbourhood.py", line 117, in get_best_neighbour_random
+    obj_value = neighbour_list[i]
+IndexError: list index out of range
+Traceback (most recent call last):
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/main.py", line 6, in <module>
+    tester.run_test()
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/tester.py", line 14, in run_test
+    tabu_search.run(address_sel, dist, steps, budget, perc)
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/tabuSearch.py", line 73, in run
+    self.__loop(budget)
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/tabuSearch.py", line 47, in __loop
+    best_neighbours_value, cost = self.__nd.get_best_neighbour_random(self.__s,
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/neighbourhood.py", line 117, in get_best_neighbour_random
+    obj_value = neighbour_list[i]
+IndexError: list index out of range
+Traceback (most recent call last):
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/main.py", line 6, in <module>
+    tester.run_test()
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/tester.py", line 14, in run_test
+    tabu_search.run(address_sel, dist, steps, budget, perc)
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/tabuSearch.py", line 73, in run
+    self.__loop(budget)
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/tabuSearch.py", line 47, in __loop
+    best_neighbours_value, cost = self.__nd.get_best_neighbour_random(self.__s,
+  File "/home/joaoresmer/pesquisa/busca-tabu/code/neighbourhood.py", line 117, in get_best_neighbour_random
+    obj_value = neighbour_list[i]
+IndexError: list index out of range
