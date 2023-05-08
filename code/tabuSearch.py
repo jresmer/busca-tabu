@@ -1,8 +1,7 @@
 from neighbourhood import Neighbourhood
-from tabuList import TabuList
 from objFuncCalculator import ObjFuncCalculator
 from interfaceManager import InterfaceManager
-from logManager import LogManager
+from csvLogManager import CSVLogManager
 import osmnx as ox
 
 
@@ -67,7 +66,7 @@ class TabuSearch:
     def run(self, address_sel=None, dist=None, steps=None, budget=None, perc=None):
         if address_sel is None:
             address_sel, dist, steps, budget, perc = self.__interface.address_selection(self.__address_list)
-        self.__log = LogManager(steps, self.__address_list[address_sel], dist, budget, perc)
+        self.__log = CSVLogManager(steps, self.__address_list[address_sel], dist, budget, perc)
         self.__nd.set_log(self.__log)
         self.__set_first_solution(address_sel, dist, steps, perc)
         self.__loop(budget)
