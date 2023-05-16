@@ -4,7 +4,7 @@ from random import choice
 from tabuList import TabuList
 from pprint import pprint
 from objFuncCalculator import ObjFuncCalculator
-from logManager import LogManager
+from csvLogManager import CSVLogManager
 from singletonMeta import SingletonMeta
 
 
@@ -13,11 +13,13 @@ class Neighbourhood(metaclass=SingletonMeta):
     def __init__(self, tabu_list=TabuList()):
         self.__obj_calculator = ObjFuncCalculator()
         self.__tabu_list = tabu_list
+        self.__value_list = []
+        self.__change_list = []
         self.__log = None
-        self.__operations = {'add': self.__add_lane, 'remove': self.__remove_lane, 'reverse': self.__reverse_lane}
+        self.__operations = {'added': self.__add_lane, 'removed': self.__remove_lane, 'reversed': self.__reverse_lane}
 
     def set_log(self, log_manager):
-        if isinstance(log_manager, LogManager):
+        if isinstance(log_manager, CSVLogManager):
             self.__log = log_manager
 
     @staticmethod
@@ -78,6 +80,7 @@ class Neighbourhood(metaclass=SingletonMeta):
         return neighbour
 
     def get_best_neighbour_random(self, solution, budget_left, max_bool):
+        solution = ox.add_edge_speeds(solution)
         solution = ox.add_edge_travel_times(solution)
         edges = [e for e in solution.edges]
 
@@ -117,28 +120,40 @@ class Neighbourhood(metaclass=SingletonMeta):
                 obj_value = neighbour_list[i]
                 _best_neighbour, log_text, cost, reverse_op = dictio[obj_value]
 
-                if log_text not in self.__tabu_list and obj_value <= obj_func_value and budget_left - cost > 0:
+                if log_text not in self.__tabu_list and obj_value <= obj_func_value and budget_left - cost >= 0:
                     obj_func_value = obj_value
                     best_neighbour = _best_neighbour
                     break
 
         self.__log.write_on_log(log_text, best_neighbour.number_of_nodes(), obj_func_value)
         self.__tabu_list.update(reverse_op)
+        self.__value_list.append(abs(obj_func_value - self.__obj_calculator.obj_func_random(solution)))
+        self.__change_list.append(reverse_op)
 
         return best_neighbour, obj_func_value, cost
 
-    def random_neighbour(self, solution, max_bool=False):
+    def reverse_change(self, solution, max_bool=False):
         solution = ox.add_edge_speeds(solution)
         solution = ox.add_edge_travel_times(solution)
-        edges = [e for e in solution.edges.keys()]
-        u, v, k = choice(edges)
-        _operation = choice(list(self.__operations.keys()))
-        if _operation == 'reverse':
-            solution = self.__operations[_operation](solution, u, v, k)
+
+        value = min(self.__value_list)
+        index = self.__value_list.index(value)
+        operation = self.__change_list.pop(index)
+        operation = operation.split()
+        operation, edges = operation[1], operation[3] + operation[4] + operation[5]
+        # edges recebe string no formato (u, v, k)
+        edges = edges.split(",")
+
+        u, v, k = int(edges[0][1:]), int(edges[1]), int(edges[2][:-1])
+
+        if operation == "reversed":
+            solution= self.__operations[operation](solution, u, v, k)
+            recovered_budget = 500
         else:
-            solution = self.__operations[_operation](solution, u, v, k, max_bool)
-
-        self.__log.write_on_log(f'{_operation} at {(u, v, k)}', solution.number_of_nodes(),
-                                self.__obj_calculator.obj_func_random(solution))
-
-        return solution
+            solution = self.__operations[operation](solution, u, v, k, max_bool)
+            if operation == "added":
+                recovered_budget = 1000
+            else:
+                recovered_budget = 1500
+        
+        return solution, recovered_budget
