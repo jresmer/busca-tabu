@@ -23,6 +23,9 @@ class TabuList:
             self.__list.pop(0)
             self.__iteration_counter = self.__iteration_reset_value
 
+    def erase(self):
+        self.__list = []
+
     def index(self, data):
         return self.__list.index(data)
 
