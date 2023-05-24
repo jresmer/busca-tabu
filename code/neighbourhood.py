@@ -91,6 +91,7 @@ class Neighbourhood(metaclass=SingletonMeta):
         reverse_op = None
 
         itr = len(edges) // 10
+        change_made = False
 
         for _ in range(itr):
             u, v, k = choice(edges)
@@ -123,7 +124,11 @@ class Neighbourhood(metaclass=SingletonMeta):
                 if log_text not in self.__tabu_list and obj_value <= obj_func_value and budget_left - cost >= 0:
                     obj_func_value = obj_value
                     best_neighbour = _best_neighbour
+                    change_made = True
                     break
+
+        if not change_made:
+            self.__tabu_list.erase()
 
         self.__log.write_on_log(log_text, best_neighbour.number_of_nodes(), obj_func_value)
         self.__tabu_list.update(reverse_op)
