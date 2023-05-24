@@ -5,17 +5,17 @@ import time
 class CSVLogManager:
 
 
-    def __init__(self, steps, address, dist, budget, perc):
+    def __init__(self, address, dist, budget):
         city = address.split(", ")
         city = city[1]
         self.__starting_time = time.time()
         self.__filename = f'{city}-log.csv'
         with open(self.__filename, 'a', newline='') as csv_file:
-            fieldnames = ['Adress', 'Steps', 'Radius', 'Budget', 'Tolerance']
+            fieldnames = ['Adress', 'Radius', 'Budget']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
-            writer.writerow({'Adress' : str(address), 'Steps' : str(steps),
-                               'Radius' : str(dist), 'Budget' : str(budget), 'Tolerance' : str(perc)})
+            writer.writerow({'Adress' : str(address),
+                               'Radius' : str(dist), 'Budget' : str(budget)})
         with open(self.__filename, 'a', newline='') as csv_file:
             fieldnames = ['Operation', 'Number of Nodes', 'Value', 'Time']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
