@@ -10,13 +10,14 @@ from singletonMeta import SingletonMeta
 
 class Neighbourhood(metaclass=SingletonMeta):
 
-    def __init__(self, tabu_list=TabuList()):
+    def __init__(self, tabu_list_size: int):
         self.__obj_calculator = ObjFuncCalculator()
-        self.__tabu_list = tabu_list
+        self.__tabu_list = TabuList(tabu_list_size)
         self.__value_list = []
         self.__change_list = []
         self.__log = None
         self.__operations = {'added': self.__add_lane, 'removed': self.__remove_lane, 'reversed': self.__reverse_lane}
+
 
     def set_log(self, log_manager):
         if isinstance(log_manager, CSVLogManager):

@@ -1,5 +1,4 @@
 from neighbourhood import Neighbourhood
-from objFuncCalculator import ObjFuncCalculator
 from interfaceManager import InterfaceManager
 from csvLogManager import CSVLogManager
 import osmnx as ox
@@ -7,8 +6,7 @@ import osmnx as ox
 
 class TabuSearch:
     def __init__(self):
-        self.__obj_calculator = ObjFuncCalculator()
-        self.__nd = Neighbourhood()
+        self.__nd = None
         self.__log = None
 
         self.__best_s = None
@@ -65,10 +63,11 @@ class TabuSearch:
     def get_best_solutions_value(self):
         return self.__best_s_value
 
-    def run(self, address_sel=None, dist=None, steps=None, budget=None, perc=None):
+    def run(self, address_sel=None, dist=None, budget=None, tabu_list_size=None):
         if address_sel is None:
-            address_sel, dist, steps, budget, perc = self.__interface.address_selection(self.__address_list)
-        self.__log = CSVLogManager(steps, self.__address_list[address_sel], dist, budget, perc)
+            address_sel, dist, budget, tabu_list_size= self.__interface.address_selection(self.__address_list)
+        self.__nd = Neighbourhood(tabu_list_size)
+        self.__log = CSVLogManager(self.__address_list[address_sel], dist, budget, tabu_list_size)
         self.__nd.set_log(self.__log)
         self.__set_first_solution(address_sel, dist, budget)
         self.__loop(budget)

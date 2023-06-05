@@ -27,16 +27,6 @@ class InterfaceManager(metaclass=SingletonMeta):
                 continue
 
             msg = """
-        Digite o número de iterações executadas ao gerar uma solução inicial:
-        """
-            steps = input(msg)
-            try:
-                steps = int(steps)
-            except ValueError:
-                print("O valor deve ser um inteiro")
-                continue
-
-            msg = """
         Digite o orçamento para as alterações:
         """
             budget = input(msg)
@@ -48,16 +38,16 @@ class InterfaceManager(metaclass=SingletonMeta):
 
 
             msg = """
-                Digite o valor percentual minimo da próxima solução para que a busca continue:
+                Digite o tamanho maximo da lista tabu:
                 """
-            perc = input(msg)
+            tabu_list_size = input(msg)
             try:
-                perc = int(perc)
+                tabu_list_size = int(tabu_list_size)
             except ValueError:
                 print("O valor deve ser um inteiro")
                 continue
 
-            return sel, radius, steps, budget, perc
+            return sel, radius, budget, tabu_list_size
 
     def quit(self):
         msg = """

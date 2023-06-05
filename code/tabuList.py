@@ -5,9 +5,9 @@ class TabuList:
 
     # CRIA LISTA DE SOLUCOES
     # SETTA NUMERO DE ITERACOES QUE UMA SOLUCAO DEVE PERMANECER NA LISTA
-    def __init__(self, iteration_counter=10, *args):
-        self.__iteration_counter = iteration_counter
-        self.__iteration_reset_value = iteration_counter
+    def __init__(self, max_size: int, *args):
+        self.__size = 0
+        self.__max_size = max_size
         self.__list = list(args)
 
     # MAGIC METHOD CHECAGEM IN
@@ -18,10 +18,10 @@ class TabuList:
     def update(self, item=None):
         if item is not None and item not in self.__list:
             self.__list.append(item)
-        self.__iteration_counter -= 1
-        if self.__iteration_counter < 1:
+        self.__size += 1
+        if self.__size > self.__max_size:
             self.__list.pop(0)
-            self.__iteration_counter = self.__iteration_reset_value
+            self.__size -= 1
 
     def erase(self):
         self.__list = []
