@@ -6,7 +6,6 @@ class TabuList:
     # CRIA LISTA DE SOLUCOES
     # SETTA NUMERO DE ITERACOES QUE UMA SOLUCAO DEVE PERMANECER NA LISTA
     def __init__(self, max_size: int, *args):
-        self.__size = 0
         self.__max_size = max_size
         self.__list = list(args)
 
@@ -18,13 +17,15 @@ class TabuList:
     def update(self, item=None):
         if item is not None and item not in self.__list:
             self.__list.append(item)
-        self.__size += 1
-        if self.__size > self.__max_size:
+        if len(self.__list) > self.__max_size:
             self.__list.pop(0)
-            self.__size -= 1
+
+    def size_getter(self):
+        return len(self.__list)
 
     def erase(self):
         self.__list = []
+        self.__size = 0
 
     def index(self, data):
         return self.__list.index(data)

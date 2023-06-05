@@ -86,7 +86,7 @@ class Neighbourhood(metaclass=SingletonMeta):
         edges = [e for e in solution.edges]
 
         best_neighbour = solution
-        obj_func_value = 10000
+        obj_func_value = 9999
         log_text = ''
         cost = 0
         reverse_op = None
@@ -100,19 +100,16 @@ class Neighbourhood(metaclass=SingletonMeta):
             dictio = {}
             # add a lane:
             neighbour = self.__add_lane(solution, u, v, k, max_bool)
-            if neighbour not in self.__tabu_list:
-                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour,\
-                    f'lane added at {(u, v, k)}', 1500, f'lane removed at {(u, v, k)}'
+            dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour,\
+                f'lane added at {(u, v, k)}', 1500, f'lane removed at {(u, v, k)}'
             # remove a lane:
             neighbour = self.__remove_lane(solution, u, v, k, max_bool)
-            if neighbour not in self.__tabu_list:
-                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour,\
-                    f'lane removed at {(u, v, k)}', 1000,  f'lane added at {(u, v, k)}'
+            dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour,\
+                f'lane removed at {(u, v, k)}', 1000,  f'lane added at {(u, v, k)}'
             # reverse lane:
             neighbour = self.__reverse_lane(solution, u, v, k)
-            if neighbour not in self.__tabu_list:
-                dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour,\
-                    f'lane reversed at {(u, v, k)}', 500, f'lane reversed at {(u, v, k)}'
+            dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour,\
+                f'lane reversed at {(u, v, k)}', 500, f'lane reversed at {(u, v, k)}'
 
             if len(dictio) == 0:
                 continue
@@ -144,18 +141,33 @@ class Neighbourhood(metaclass=SingletonMeta):
 
         value = min(self.__value_list)
         index = self.__value_list.index(value)
+        self.__value_list.pop(index)
         operation = self.__change_list.pop(index)
         operation = operation.split()
         operation, edges = operation[1], operation[3] + operation[4] + operation[5]
-        # edges recebe string no formato (u, v, k)
         edges = edges.split(",")
+        recovered_budget = 0
 
         u, v, k = int(edges[0][1:]), int(edges[1]), int(edges[2][:-1])
 
         if operation == "reversed":
-            solution= self.__operations[operation](solution, u, v, k)
+            if (u, v, k) not in [e for e in solution.edges]:
+                if (v, u, k) in [e for e in solution.edges]:
+                    u, v = v, u
+                else:   # edge no longer exists
+                    return solution, 500
+            solution = self.__operations[operation](solution, u, v, k)
             recovered_budget = 500
         else:
+            if (u, v, k) not in [e for e in solution.edges]:
+                if (v, u, k) in [e for e in solution.edges]:
+                    u, v = v, u
+                elif operation == "added":
+                    solution.add_edge(u, v)
+                    solution = ox.add_edge_speeds(solution)
+                    solution = ox.add_edge_travel_times(solution)
+                else:   # edge no longer exists
+                    return solution, 1000
             solution = self.__operations[operation](solution, u, v, k, max_bool)
             if operation == "added":
                 recovered_budget = 1000

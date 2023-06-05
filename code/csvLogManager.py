@@ -28,7 +28,7 @@ class CSVLogManager:
             writer.writerow({'Operation' : operation, 'Number of Nodes' : str(num_nodes),
                               'Value' : str(solution_value), 'Time' : str(time.time() - self.__starting_time)})
 
-    def quit(self, status=''):
+    def quit(self, status='None'):
         with open(self.__filename, 'a', newline='') as csv_file:
             fieldnames = ['Status', 'Ending Time']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)

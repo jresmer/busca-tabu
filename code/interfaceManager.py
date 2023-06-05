@@ -47,7 +47,17 @@ class InterfaceManager(metaclass=SingletonMeta):
                 print("O valor deve ser um inteiro")
                 continue
 
-            return sel, radius, budget, tabu_list_size
+            msg = """
+                Digite o numero de iteracoes desejado:
+                """
+            itr = input(msg)
+            try:
+                itr = int(itr)
+            except ValueError:
+                print("O valor deve ser um inteiro")
+                continue
+
+            return sel, radius, budget, tabu_list_size, itr
 
     def quit(self):
         msg = """
