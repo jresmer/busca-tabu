@@ -97,8 +97,8 @@ class Neighbourhood(metaclass=SingletonMeta):
         for _ in range(itr):
             u, v, k = choice(edges)
             edges.remove((u, v, k))
-            values = []
-            changes = []
+            values = [0]*3
+            changes = [None]*3
             # add a lane:
             neighbour = self.__add_lane(solution, u, v, k, max_bool)
             values[0] = self.__obj_calculator.obj_func_random(neighbour)
