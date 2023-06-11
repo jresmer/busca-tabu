@@ -97,27 +97,28 @@ class Neighbourhood(metaclass=SingletonMeta):
         for _ in range(itr):
             u, v, k = choice(edges)
             edges.remove((u, v, k))
-            dictio = {}
+            values = []
+            changes = []
             # add a lane:
             neighbour = self.__add_lane(solution, u, v, k, max_bool)
-            dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour,\
+            values[0] = self.__obj_calculator.obj_func_random(neighbour)
+            changes [0]= neighbour,\
                 f'lane added at {(u, v, k)}', 1500, f'lane removed at {(u, v, k)}'
             # remove a lane:
             neighbour = self.__remove_lane(solution, u, v, k, max_bool)
-            dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour,\
+            values[1] = self.__obj_calculator.obj_func_random(neighbour)
+            changes [1] = neighbour,\
                 f'lane removed at {(u, v, k)}', 1000,  f'lane added at {(u, v, k)}'
             # reverse lane:
             neighbour = self.__reverse_lane(solution, u, v, k)
-            dictio[self.__obj_calculator.obj_func_random(neighbour)] = neighbour,\
+            values[2] = self.__obj_calculator.obj_func_random(neighbour)
+            changes[2] = neighbour,\
                 f'lane reversed at {(u, v, k)}', 500, f'lane reversed at {(u, v, k)}'
 
-            if len(dictio) == 0:
-                continue
             for i in range(3):
-                neighbour_list = list(dictio.keys())
-                neighbour_list.sort()
-                obj_value = neighbour_list[i]
-                _best_neighbour, log_text, cost, reverse_op = dictio[obj_value]
+                obj_value = min(values)
+                min_value_index = values.index(obj_value)
+                _best_neighbour, log_text, cost, reverse_op = changes[min_value_index]
 
                 if log_text not in self.__tabu_list and obj_value <= obj_func_value and budget_left - cost >= 0:
                     obj_func_value = obj_value
