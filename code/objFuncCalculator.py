@@ -52,12 +52,11 @@ class ObjFuncCalculator:
             
             return shortest_path_length
         
-        def parallel_random_obj_func(self, solution, num_tests=None):
+        def parallel_random_obj_func(self, solution, num_tests):
             with cf.ProcessPoolExecutor() as pool_executor:
                 edges = [e for e in solution.edges]
-                if num_tests is None: num_tests = len(edges)
                 edges_ = sample(edges, num_tests)
-                futures = {pool_executor.submit(self.__time_step, edge) for edge in edges}
+                futures = {pool_executor.submit(self.__time_step, edge) for edge in edges_}
 
                 total_time = 0
                 for future in cf.as_completed(futures):
