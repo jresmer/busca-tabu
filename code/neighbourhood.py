@@ -1,7 +1,7 @@
 import osmnx as ox
 import concurrent.futures as cf
 import copy
-from random import choice
+from random import choice, sample
 from tabuList import TabuList
 from pprint import pprint
 from objFuncCalculator import ObjFuncCalculator
@@ -143,9 +143,8 @@ class Neighbourhood(metaclass=SingletonMeta):
     def get_neighbours(self, solution, edges, max_bool, itr):
         values = []
         changes = []
-        for _ in range(itr):
-            u, v, k = choice(edges)
-            edges.remove((u, v, k))
+        edges = sample(edges, itr)
+        for u, v, k in edges:
             # add a lane:
             neighbour = self.add_lane(solution, u, v, k, max_bool)
             values.append(self.__obj_calculator.random_obj_func(neighbour))
