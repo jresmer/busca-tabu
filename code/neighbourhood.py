@@ -207,7 +207,6 @@ class Neighbourhood(metaclass=SingletonMeta):
         self.__tabu_list.update(reverse_op)
         self.__value_list.append(abs(obj_func_value - self.__obj_calculator.random_obj_func(solution)))
         self.__change_list.append(reverse_op)
-        print("SUCESSO???")
         return best_neighbour, obj_func_value, cost
 
     def reverse_change(self, solution, max_bool=False):
