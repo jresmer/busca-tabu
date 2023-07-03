@@ -4,10 +4,8 @@ import networkx as nx
 
 class ObjFuncCalculator:
 
-    def __init__(self) -> None:
-        self.__tested_pairs = []
-
-    def random_obj_func(self, solution, num_tests=100, attempt_limit=10000) -> float:
+    @staticmethod
+    def random_obj_func(solution, num_tests=300, attempt_limit=10000) -> float:
         edges = [e for e in solution.edges]
         pair_list = []
 
