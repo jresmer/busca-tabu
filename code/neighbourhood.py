@@ -238,8 +238,6 @@ class Neighbourhood(metaclass=SingletonMeta):
                     u, v = v, u
                 elif operation == "added":
                     solution.add_edge(u, v)
-                    solution = ox.add_edge_speeds(solution)
-                    solution = ox.add_edge_travel_times(solution)
                 else:   # edge no longer exists
                     return solution, 1000
             solution = self.__operations[operation](solution, u, v, k, max_bool)
