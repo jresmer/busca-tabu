@@ -17,7 +17,7 @@ class Neighbourhood(metaclass=SingletonMeta):
         self.__value_list = []
         self.__change_list = []
         self.__log = None
-        self.__operations = {'added': self.add_lane, 'removed': self.remove_lane, 'reversed': self.reverse_lane}
+        # self.__operations = {'added': self.add_lane, 'removed': self.remove_lane, 'reversed': self.reverse_lane}
 
 
     def set_log(self, log_manager):
@@ -177,7 +177,7 @@ class Neighbourhood(metaclass=SingletonMeta):
         edges = [e for e in solution.edges]
 
         best_neighbour = solution
-        obj_func_value = 9999
+        obj_func_value = self.__obj_calculator.random_obj_func(solution)
         log_text = ''
         cost = 0
         reverse_op = None
@@ -202,6 +202,7 @@ class Neighbourhood(metaclass=SingletonMeta):
 
         if not change_made:
             self.__tabu_list.erase()
+            return best_neighbour, obj_func_value, 0
 
         self.__log.write_on_log(log_text, best_neighbour.number_of_nodes(), obj_func_value)
         self.__tabu_list.update(reverse_op)
@@ -224,26 +225,21 @@ class Neighbourhood(metaclass=SingletonMeta):
 
         u, v, k = int(edges[0][1:]), int(edges[1]), int(edges[2][:-1])
 
-        if operation == "reversed":
-            if (u, v, k) not in [e for e in solution.edges]:
-                if (v, u, k) in [e for e in solution.edges]:
-                    u, v = v, u
-                else:   # edge no longer exists
-                    return solution, 500
-            solution = self.__operations[operation](solution, u, v, k)
-            recovered_budget = 500
+        d = {'reversed' : 500, "added" : 1000, "removed" : 1500}
+        if (u, v, k) not in [e for e in solution.edges]:
+            if (v, u, k) in [e for e in solution.edges]:
+                u, v = v, u
         else:
-            if (u, v, k) not in [e for e in solution.edges]:
-                if (v, u, k) in [e for e in solution.edges]:
-                    u, v = v, u
-                elif operation == "added":
-                    solution.add_edge(u, v)
-                else:   # edge no longer exists
-                    return solution, 1000
-            solution = self.__operations[operation](solution, u, v, k, max_bool)
-            if operation == "added":
-                recovered_budget = 1000
-            else:
-                recovered_budget = 1500
+            print(f'Lane not found!')
+            return solution, d[operation]
+        if operation == "reversed":
+            solution = self.reverse_lane(solution, u, v, k)
+            recovered_budget = 500
+        elif operation == "added":
+            solution = self.add_lane(solution, u, v, k)
+            recovered_budget = 1000
+        else:
+            solution = self.remove_lane(solution, u, v, k)
+            recovered_budget = 1500
         
         return solution, recovered_budget
