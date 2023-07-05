@@ -6,20 +6,18 @@ class ObjFuncCalculator:
 
     @staticmethod
     def random_obj_func(solution, num_tests=300, attempt_limit=10000) -> float:
-        edges = [e for e in solution.edges]
+        nodes = list(solution.nodes)
         pair_list = []
 
         t_routes = 0
         t_time = 0
 
         while attempt_limit > 0:
-            length = len(edges) - 1
-            if length == -1:
-                break
 
-            origin, dest, k = choice(edges)
+            origin = choice(nodes)
+            dest = choice(nodes)
 
-            if (origin, dest) in pair_list:
+            if (origin, dest) in pair_list or not nx.has_path(solution, origin, dest):
                 continue
 
             pair_list.append((origin, dest))
