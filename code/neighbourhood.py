@@ -28,7 +28,9 @@ class Neighbourhood(metaclass=SingletonMeta):
     def add_lane(solution, u, v, k, max_bool):
         neighbour = copy.deepcopy(solution)
         edge = solution.edges[(u, v, k)]
-        lanes = edge['lanes'] if 'lanes' in edge else ['1', '1']
+        if 'lanes' not in edge:
+            edge['lanes'] = ['1', '1']
+        lanes = edge['lanes']
         try:
             if isinstance(lanes, str):
                 edge['lanes'] = str(int(lanes) - 1)
@@ -39,26 +41,25 @@ class Neighbourhood(metaclass=SingletonMeta):
         except Exception as e:
             pprint(e)
         neighbour[u][v][k]['lanes'] = edge['lanes']
-        neighbour = ox.add_edge_travel_times(neighbour)
         return neighbour
 
     @staticmethod
     def remove_lane(solution, u, v, k, max_bool):
         neighbour = copy.deepcopy(solution)
         edge = solution.edges[(u, v, k)]
-        lanes = edge['lanes'] if 'lanes' in edge else ['1', '1']
-        if lanes != '1':
-            try:
-                if isinstance(lanes, str):
-                    edge['lanes'] = str(int(lanes) - 1)
-                elif max_bool:
-                    edge['lanes'] = str(int(max(lanes)) - 1)
-                else:
-                    edge['lanes'] = str(int(min(lanes)) - 1)
-            except Exception as e:
-                pprint(e)
+        if 'lanes' not in edge:
+            edge['lanes'] = ['0', '0']
+        lanes = edge['lanes']
+        try:
+            if isinstance(lanes, str):
+                edge['lanes'] = str(int(lanes) - 1) if int(lanes) > 0 else edge['lanes']
+            elif max_bool:
+                edge['lanes'] = str(int(max(lanes)) - 1) if int(max(lanes)) > 0 else edge['lanes']
+            else:
+                edge['lanes'] = str(int(min(lanes)) - 1) if int(min(lanes)) > 0 else edge['lanes']
+        except Exception as e:
+            pprint(e)
         neighbour[u][v][k]['lanes'] = edge['lanes']
-        neighbour = ox.add_edge_travel_times(neighbour)
         return neighbour
 
     @staticmethod
@@ -236,10 +237,10 @@ class Neighbourhood(metaclass=SingletonMeta):
             solution = self.reverse_lane(solution, u, v, k)
             recovered_budget = 500
         elif operation == "added":
-            solution = self.add_lane(solution, u, v, k)
+            solution = self.add_lane(solution, u, v, k, max_bool)
             recovered_budget = 1000
         else:
-            solution = self.remove_lane(solution, u, v, k)
+            solution = self.remove_lane(solution, u, v, k, max_bool)
             recovered_budget = 1500
         
         return solution, recovered_budget
