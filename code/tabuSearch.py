@@ -65,7 +65,7 @@ class TabuSearch:
     def get_best_solutions_value(self):
         return self.__best_s_value
 
-    def run(self, address_sel=None, dist=None, budget=None, tabu_list_size=None, itr=50): # 500
+    def run(self, address_sel=None, dist=None, budget=None, tabu_list_size=None, itr=100):
         if address_sel is None:
             address_sel, dist, budget, tabu_list_size, itr = self.__interface.address_selection(self.__address_list)
         self.__nd = Neighbourhood(tabu_list_size)
