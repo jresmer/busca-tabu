@@ -230,9 +230,9 @@ class Neighbourhood(metaclass=SingletonMeta):
         if (u, v, k) not in [e for e in solution.edges]:
             if (v, u, k) in [e for e in solution.edges]:
                 u, v = v, u
-        else:
-            print(f'Lane not found!')
-            return solution, d[operation]
+            else:
+                print(f'Edge not found!')
+                return solution, d[operation]
         if operation == "reversed":
             solution = self.reverse_lane(solution, u, v, k)
             recovered_budget = 500
