@@ -17,7 +17,6 @@ class Neighbourhood(metaclass=SingletonMeta):
         self.__value_list = []
         self.__change_list = []
         self.__log = None
-        # self.__operations = {'added': self.add_lane, 'removed': self.remove_lane, 'reversed': self.reverse_lane}
 
 
     def set_log(self, log_manager):
@@ -134,7 +133,7 @@ class Neighbourhood(metaclass=SingletonMeta):
         if not change_made:
             self.__tabu_list.erase()
 
-        self.__log.write_on_log(log_text, best_neighbour.number_of_nodes(), obj_func_value)
+        self.__log.write_on_log(log_text, best_neighbour.number_of_nodes(), best_neighbour.number_of_edges(), obj_func_value)
         self.__tabu_list.update(reverse_op)
         self.__value_list.append(abs(obj_func_value - self.__obj_calculator.random_obj_func(solution)))
         self.__change_list.append(reverse_op)
@@ -205,10 +204,11 @@ class Neighbourhood(metaclass=SingletonMeta):
             self.__tabu_list.erase()
             return best_neighbour, obj_func_value, 0
 
-        self.__log.write_on_log(log_text, best_neighbour.number_of_nodes(), obj_func_value)
+        self.__log.write_on_log(log_text, best_neighbour.number_of_nodes(), best_neighbour.number_of_edges(), obj_func_value)
         self.__tabu_list.update(reverse_op)
         self.__value_list.append(abs(obj_func_value - self.__obj_calculator.random_obj_func(solution)))
         self.__change_list.append(reverse_op)
+        
         return best_neighbour, obj_func_value, cost
 
     def reverse_change(self, solution, max_bool=False):

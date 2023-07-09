@@ -30,8 +30,8 @@ class TabuSearch:
         while budget > 499:
             max_bool = not max_bool
             best_neighbour, \
-                best_neighbours_value, cost = self.__nd.parallel_get_best_neighbour(self.__s,
-                                                                                  budget, max_bool, 7)
+                best_neighbours_value, cost = self.__nd.get_best_neighbour_random(self.__s,
+                                                                                  budget, max_bool)
             self.__s = best_neighbour
             self.__opt_value = best_neighbours_value
             budget -= cost
@@ -50,8 +50,8 @@ class TabuSearch:
             budget += added_budget
             # gera um novo vizinho:
             best_neighbour, \
-                best_neighbours_value, cost = self.__nd.parallel_get_best_neighbour(self.__s,
-                                                                                  budget, max_bool, 7)
+                best_neighbours_value, cost = self.__nd.get_best_neighbour_random(self.__s,
+                                                                                  budget, max_bool)
             self.__opt_value = best_neighbours_value
             self.__s = best_neighbour
             budget -= cost
@@ -65,7 +65,7 @@ class TabuSearch:
     def get_best_solutions_value(self):
         return self.__best_s_value
 
-    def run(self, address_sel=None, dist=None, budget=None, tabu_list_size=None, itr=100):
+    def run(self, address_sel=None, dist=None, budget=None, tabu_list_size=None, itr=50):
         if address_sel is None:
             address_sel, dist, budget, tabu_list_size, itr = self.__interface.address_selection(self.__address_list)
         self.__nd = Neighbourhood(tabu_list_size)

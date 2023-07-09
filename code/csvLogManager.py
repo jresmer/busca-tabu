@@ -17,15 +17,15 @@ class CSVLogManager:
             writer.writerow({'Adress' : str(address), 'Radius' : str(dist),
                                 'Budget' : str(budget), "Tabu List's Max Size" : str(tabu_list_size)})
         with open(self.__filename, 'a', newline='') as csv_file:
-            fieldnames = ['Operation', 'Number of Nodes', 'Value', 'Time']
+            fieldnames = ['Operation', 'Number of Nodes', 'Number of Edges', 'Value', 'Time']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
 
-    def write_on_log(self, operation, num_nodes, solution_value):
+    def write_on_log(self, operation, n_nodes, n_edges, solution_value):
         with open(self.__filename, 'a', newline='') as csv_file:
-            fieldnames = ['Operation', 'Number of Nodes', 'Value', 'Time']
+            fieldnames = ['Operation', 'Number of Nodes', 'Number of Edges', 'Value', 'Time']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-            writer.writerow({'Operation' : operation, 'Number of Nodes' : str(num_nodes),
+            writer.writerow({'Operation' : operation, 'Number of Nodes' : str(n_nodes), 'Number of Edges' : str(n_edges),
                               'Value' : str(solution_value), 'Time' : str(time.time() - self.__starting_time)})
 
     def quit(self, status='None'):
