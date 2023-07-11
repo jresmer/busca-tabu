@@ -52,7 +52,6 @@ class TabuSearch:
             best_neighbour, \
                 best_neighbours_value, cost = self.__nd.get_best_neighbour_random(self.__s,
                                                                                   budget, max_bool)
-            self.__opt_value = best_neighbours_value
             self.__s = best_neighbour
             budget -= cost
             if best_neighbours_value < self.__best_s_value:

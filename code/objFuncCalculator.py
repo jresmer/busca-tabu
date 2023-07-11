@@ -5,8 +5,9 @@ import networkx as nx
 class ObjFuncCalculator:
 
     @staticmethod
-    def random_obj_func(solution, num_tests=300, attempt_limit=10000) -> float:
+    def random_obj_func(solution, attempt_limit=1000) -> float:
         nodes = list(solution.nodes)
+        n_tests = (len(nodes) ** 2) // 2 if len(nodes) <  15 else 100
         pair_list = []
 
         t_routes = 0
@@ -28,7 +29,7 @@ class ObjFuncCalculator:
             t_time += shortest_path_length
             t_routes += 1
 
-            if t_routes == num_tests:
+            if t_routes == n_tests:
                 break
 
         if t_routes > 0:

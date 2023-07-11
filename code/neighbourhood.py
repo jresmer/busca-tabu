@@ -47,37 +47,40 @@ class Neighbourhood(metaclass=SingletonMeta):
         neighbour = copy.deepcopy(solution)
         edge = solution.edges[(u, v, k)]
         if 'lanes' not in edge:
-            edge['lanes'] = ['0', '0']
+            edge['lanes'] = ['1', '1']
         lanes = edge['lanes']
         try:
             if isinstance(lanes, str):
-                edge['lanes'] = str(int(lanes) - 1) if int(lanes) > 0 else edge['lanes']
+                edge['lanes'] = str(int(lanes) - 1) if int(lanes) > 1 else edge['lanes']
             elif max_bool:
-                edge['lanes'] = str(int(max(lanes)) - 1) if int(max(lanes)) > 0 else edge['lanes']
+                edge['lanes'] = str(int(max(lanes)) - 1) if int(max(lanes)) > 1 else edge['lanes']
             else:
-                edge['lanes'] = str(int(min(lanes)) - 1) if int(min(lanes)) > 0 else edge['lanes']
+                edge['lanes'] = str(int(min(lanes)) - 1) if int(min(lanes)) > 1 else edge['lanes']
         except Exception as e:
             pprint(e)
         neighbour[u][v][k]['lanes'] = edge['lanes']
         return neighbour
 
-    @staticmethod
-    def reverse_lane(solution, u, v, k):
+    def reverse_lane(self, solution, u, v, k):
         neighbour = copy.deepcopy(solution)
         edge = solution.edges[(u, v, k)]
         lanes = edge['lanes'] if 'lanes' in edge else ['1', '1']
         if isinstance(lanes, str) or 'lanes' not in edge:
-            try:
-                attrs = neighbour[u][v][k]
-                neighbour.remove_edge(u, v, k)
-                neighbour.add_edge(v, u, k)
-                for key in attrs.keys():
-                    neighbour[v][u][k][key] = attrs[key]
-            except Exception as e:
-                pprint(e)
+            if (v, u, k) in [e for e in solution.edges]:
+                self.add_lane(solution, v, u, k, False)
+                self.remove_lane(solution, u, v, k, False)
+            else:
+                try:
+                    attrs = neighbour[u][v][k]
+                    neighbour.remove_edge(u, v, k)
+                    neighbour.add_edge(v, u, k)
+                    for key in attrs.keys():
+                        neighbour[v][u][k][key] = attrs[key]
+                except Exception as e:
+                    pprint(e)
         elif len(lanes) == 2:
-            edge["lanes"][0] = int(edge["lanes"][0]) - 1
-            edge["lanes"][1] = int(edge["lanes"][1]) + 1
+            edge["lanes"][0] = str(int(edge["lanes"][0]) - 1)
+            edge["lanes"][1] = str(int(edge["lanes"][1]) + 1)
             neighbour[u][v][k]['lanes'] = edge['lanes']
         return neighbour
 
@@ -132,6 +135,7 @@ class Neighbourhood(metaclass=SingletonMeta):
 
         if not change_made:
             self.__tabu_list.erase()
+            return best_neighbour, 9999, 0
 
         self.__log.write_on_log(log_text, best_neighbour.number_of_nodes(), best_neighbour.number_of_edges(), obj_func_value)
         self.__tabu_list.update(reverse_op)
