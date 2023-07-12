@@ -25,7 +25,7 @@ class Neighbourhood(metaclass=SingletonMeta):
 
     @staticmethod
     def add_lane(solution, u, v, k, max_bool):
-        neighbour = copy.deepcopy(solution)
+        neighbor = copy.deepcopy(solution)
         edge = solution.edges[(u, v, k)]
         if 'lanes' not in edge:
             edge['lanes'] = ['1', '1']
@@ -39,12 +39,12 @@ class Neighbourhood(metaclass=SingletonMeta):
                 edge['lanes'] = str(int(min(lanes)) + 1)
         except Exception as e:
             pprint(e)
-        neighbour[u][v][k]['lanes'] = edge['lanes']
-        return neighbour
+        neighbor[u][v][k]['lanes'] = edge['lanes']
+        return neighbor
 
     @staticmethod
     def remove_lane(solution, u, v, k, max_bool):
-        neighbour = copy.deepcopy(solution)
+        neighbor = copy.deepcopy(solution)
         edge = solution.edges[(u, v, k)]
         if 'lanes' not in edge:
             edge['lanes'] = ['1', '1']
@@ -58,11 +58,11 @@ class Neighbourhood(metaclass=SingletonMeta):
                 edge['lanes'] = str(int(min(lanes)) - 1) if int(min(lanes)) > 1 else edge['lanes']
         except Exception as e:
             pprint(e)
-        neighbour[u][v][k]['lanes'] = edge['lanes']
-        return neighbour
+        neighbor[u][v][k]['lanes'] = edge['lanes']
+        return neighbor
 
     def reverse_lane(self, solution, u, v, k):
-        neighbour = copy.deepcopy(solution)
+        neighbor = copy.deepcopy(solution)
         edge = solution.edges[(u, v, k)]
         lanes = edge['lanes'] if 'lanes' in edge else ['1', '1']
         if isinstance(lanes, str) or 'lanes' not in edge:
@@ -71,25 +71,25 @@ class Neighbourhood(metaclass=SingletonMeta):
                 self.remove_lane(solution, u, v, k, False)
             else:
                 try:
-                    attrs = neighbour[u][v][k]
-                    neighbour.remove_edge(u, v, k)
-                    neighbour.add_edge(v, u, k)
+                    attrs = neighbor[u][v][k]
+                    neighbor.remove_edge(u, v, k)
+                    neighbor.add_edge(v, u, k)
                     for key in attrs.keys():
-                        neighbour[v][u][k][key] = attrs[key]
+                        neighbor[v][u][k][key] = attrs[key]
                 except Exception as e:
                     pprint(e)
         elif len(lanes) == 2:
             edge["lanes"][0] = str(int(edge["lanes"][0]) - 1)
             edge["lanes"][1] = str(int(edge["lanes"][1]) + 1)
-            neighbour[u][v][k]['lanes'] = edge['lanes']
-        return neighbour
+            neighbor[u][v][k]['lanes'] = edge['lanes']
+        return neighbor
 
-    def get_best_neighbour_random(self, solution, budget_left, max_bool):
+    def get_best_neighbor_random(self, solution, budget_left, max_bool):
         solution = ox.add_edge_speeds(solution)
         solution = ox.add_edge_travel_times(solution)
         edges = [e for e in solution.edges]
 
-        best_neighbour = solution
+        best_neighbor = solution
         obj_func_value = 9999
         log_text = ''
         cost = 0
@@ -104,29 +104,29 @@ class Neighbourhood(metaclass=SingletonMeta):
             values = [0]*3
             changes = [None]*3
             # add a lane:
-            neighbour = self.add_lane(solution, u, v, k, max_bool)
-            values[0] = self.__obj_calculator.random_obj_func(neighbour)
-            changes [0]= neighbour,\
+            neighbor = self.add_lane(solution, u, v, k, max_bool)
+            values[0] = self.__obj_calculator.random_obj_func(neighbor)
+            changes [0]= neighbor,\
                 f'lane added at {(u, v, k)}', 1500, f'lane removed at {(u, v, k)}'
             # remove a lane:
-            neighbour = self.remove_lane(solution, u, v, k, max_bool)
-            values[1] = self.__obj_calculator.random_obj_func(neighbour)
-            changes [1] = neighbour,\
+            neighbor = self.remove_lane(solution, u, v, k, max_bool)
+            values[1] = self.__obj_calculator.random_obj_func(neighbor)
+            changes [1] = neighbor,\
                 f'lane removed at {(u, v, k)}', 1000,  f'lane added at {(u, v, k)}'
             # reverse lane:
-            neighbour = self.reverse_lane(solution, u, v, k)
-            values[2] = self.__obj_calculator.random_obj_func(neighbour)
-            changes[2] = neighbour,\
+            neighbor = self.reverse_lane(solution, u, v, k)
+            values[2] = self.__obj_calculator.random_obj_func(neighbor)
+            changes[2] = neighbor,\
                 f'lane reversed at {(u, v, k)}', 500, f'lane reversed at {(u, v, k)}'
 
             for _ in range(3):
                 obj_value = min(values)
                 min_value_index = values.index(obj_value)
-                _best_neighbour, _log_text, _cost, _reverse_op = changes[min_value_index]
+                _best_neighbor, _log_text, _cost, _reverse_op = changes[min_value_index]
 
                 if _log_text not in self.__tabu_list and obj_value <= obj_func_value and budget_left - cost >= 0:
                     obj_func_value = obj_value
-                    best_neighbour = _best_neighbour
+                    best_neighbor = _best_neighbor
                     log_text = _log_text
                     cost = _cost
                     reverse_op = _reverse_op
@@ -135,52 +135,52 @@ class Neighbourhood(metaclass=SingletonMeta):
 
         if not change_made:
             self.__tabu_list.erase()
-            return best_neighbour, 9999, 0
+            return best_neighbor, 9999, 0
 
-        self.__log.write_on_log(log_text, best_neighbour.number_of_nodes(), best_neighbour.number_of_edges(), obj_func_value)
+        self.__log.write_on_log(log_text, best_neighbor.number_of_nodes(), best_neighbor.number_of_edges(), obj_func_value)
         self.__tabu_list.update(reverse_op)
         self.__value_list.append(abs(obj_func_value - self.__obj_calculator.random_obj_func(solution)))
         self.__change_list.append(reverse_op)
 
-        return best_neighbour, obj_func_value, cost
+        return best_neighbor, obj_func_value, cost
     
-    def get_neighbours(self, solution, edges, max_bool, itr):
+    def get_neighbors(self, solution, edges, max_bool, itr):
         values = []
         changes = []
         edges = sample(edges, itr)
         for u, v, k in edges:
             # add a lane:
-            neighbour = self.add_lane(solution, u, v, k, max_bool)
-            values.append(self.__obj_calculator.random_obj_func(neighbour))
-            changes.append((neighbour,\
+            neighbor = self.add_lane(solution, u, v, k, max_bool)
+            values.append(self.__obj_calculator.random_obj_func(neighbor))
+            changes.append((neighbor,\
                 f'lane added at {(u, v, k)}', 1500, f'lane removed at {(u, v, k)}'))
             # remove a lane:
-            neighbour = self.remove_lane(solution, u, v, k, max_bool)
-            values.append(self.__obj_calculator.random_obj_func(neighbour))
-            changes.append((neighbour,\
+            neighbor = self.remove_lane(solution, u, v, k, max_bool)
+            values.append(self.__obj_calculator.random_obj_func(neighbor))
+            changes.append((neighbor,\
                 f'lane removed at {(u, v, k)}', 1000,  f'lane added at {(u, v, k)}'))
             # reverse lane:
-            neighbour = self.reverse_lane(solution, u, v, k)
-            values.append(self.__obj_calculator.random_obj_func(neighbour))
-            changes.append((neighbour,\
+            neighbor = self.reverse_lane(solution, u, v, k)
+            values.append(self.__obj_calculator.random_obj_func(neighbor))
+            changes.append((neighbor,\
                 f'lane reversed at {(u, v, k)}', 500, f'lane reversed at {(u, v, k)}'))
         
         for _ in range(itr):
             obj_value = min(values)
             min_value_index = values.index(obj_value)
-            _best_neighbour, log_text, cost, reverse_op = changes[min_value_index]
+            _best_neighbor, log_text, cost, reverse_op = changes[min_value_index]
 
             if log_text not in self.__tabu_list:
                 break
 
-        return _best_neighbour, log_text, cost, reverse_op, obj_value
+        return _best_neighbor, log_text, cost, reverse_op, obj_value
     
-    def parallel_get_best_neighbour(self, solution, budget_left, max_bool, cores=20):
+    def parallel_get_best_neighbor(self, solution, budget_left, max_bool, cores=20):
         solution = ox.add_edge_speeds(solution)
         solution = ox.add_edge_travel_times(solution)
         edges = [e for e in solution.edges]
 
-        best_neighbour = solution
+        best_neighbor = solution
         obj_func_value = self.__obj_calculator.random_obj_func(solution)
         log_text = ''
         cost = 0
@@ -190,12 +190,12 @@ class Neighbourhood(metaclass=SingletonMeta):
         change_made = False
 
         with cf.ProcessPoolExecutor(max_workers=cores) as p_executor:
-            futures = {p_executor.submit(self.get_neighbours, solution, edges, max_bool, itr)}
+            futures = {p_executor.submit(self.get_neighbors, solution, edges, max_bool, itr)}
 
             for future in cf.as_completed(futures):
-                neighbour, _log_text, _cost, _reverse_op, obj_value = future.result()
+                neighbor, _log_text, _cost, _reverse_op, obj_value = future.result()
                 if obj_value < obj_func_value and budget_left - _cost >= 0:
-                    best_neighbour = neighbour
+                    best_neighbor = neighbor
                     obj_func_value = obj_value
                     log_text = _log_text
                     cost = _cost
@@ -206,14 +206,14 @@ class Neighbourhood(metaclass=SingletonMeta):
 
         if not change_made:
             self.__tabu_list.erase()
-            return best_neighbour, obj_func_value, 0
+            return best_neighbor, obj_func_value, 0
 
-        self.__log.write_on_log(log_text, best_neighbour.number_of_nodes(), best_neighbour.number_of_edges(), obj_func_value)
+        self.__log.write_on_log(log_text, best_neighbor.number_of_nodes(), best_neighbor.number_of_edges(), obj_func_value)
         self.__tabu_list.update(reverse_op)
         self.__value_list.append(abs(obj_func_value - self.__obj_calculator.random_obj_func(solution)))
         self.__change_list.append(reverse_op)
         
-        return best_neighbour, obj_func_value, cost
+        return best_neighbor, obj_func_value, cost
 
     def reverse_change(self, solution, max_bool=False):
         solution = ox.add_edge_speeds(solution)

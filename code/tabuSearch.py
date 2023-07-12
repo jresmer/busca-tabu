@@ -29,11 +29,11 @@ class TabuSearch:
         contador = 0
         while budget > 499:
             max_bool = not max_bool
-            best_neighbour, \
-                best_neighbours_value, cost = self.__nd.get_best_neighbour_random(self.__s,
+            best_neighbor, \
+                best_neighbors_value, cost = self.__nd.get_best_neighbor_random(self.__s,
                                                                                   budget, max_bool)
-            self.__s = best_neighbour
-            self.__opt_value = best_neighbours_value
+            self.__s = best_neighbor
+            self.__opt_value = best_neighbors_value
             budget -= cost
             contador += 1
 
@@ -49,14 +49,14 @@ class TabuSearch:
             self.__s, added_budget = self.__nd.reverse_change(self.__s, max_bool)
             budget += added_budget
             # gera um novo vizinho:
-            best_neighbour, \
-                best_neighbours_value, cost = self.__nd.get_best_neighbour_random(self.__s,
+            best_neighbor, \
+                best_neighbors_value, cost = self.__nd.get_best_neighbor_random(self.__s,
                                                                                   budget, max_bool)
-            self.__s = best_neighbour
+            self.__s = best_neighbor
             budget -= cost
-            if best_neighbours_value < self.__best_s_value:
-                self.__best_s = best_neighbour
-                self.__best_s_value = best_neighbours_value
+            if best_neighbors_value < self.__best_s_value:
+                self.__best_s = best_neighbor
+                self.__best_s_value = best_neighbors_value
 
     def get_best_solution(self):
         return self.__best_s
