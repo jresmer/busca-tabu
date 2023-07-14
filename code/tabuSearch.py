@@ -30,7 +30,7 @@ class TabuSearch:
         while budget > 499:
             max_bool = not max_bool
             best_neighbor, \
-                best_neighbors_value, cost = self.__nd.get_best_neighbor_random(self.__s,
+                best_neighbors_value, cost = self.__nd.parallel_get_best_neighbor(self.__s,
                                                                                   budget, max_bool)
             self.__s = best_neighbor
             self.__opt_value = best_neighbors_value
@@ -50,7 +50,7 @@ class TabuSearch:
             budget += added_budget
             # gera um novo vizinho:
             best_neighbor, \
-                best_neighbors_value, cost = self.__nd.get_best_neighbor_random(self.__s,
+                best_neighbors_value, cost = self.__nd.parallel_get_best_neighbor(self.__s,
                                                                                   budget, max_bool)
             self.__s = best_neighbor
             budget -= cost

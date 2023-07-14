@@ -8,7 +8,7 @@ class Tester:
     def run_test():
         dao = SolutionDAO()
         for address_sel in [0, 1, 2]:
-            for dist in [500, 1500]:
+            for dist in [4500]:
                 for budget in [30000, 80000, 130000]:
                     for tabu_list_size in [20, 40, 80]:
                         tabu_search = TabuSearch()
