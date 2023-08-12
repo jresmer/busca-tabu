@@ -68,7 +68,7 @@ class TabuSearch:
         if address_sel is None:
             address_sel, dist, budget, tabu_list_size, itr = self.__interface.address_selection(self.__address_list)
         self.__nd = Neighbourhood(tabu_list_size)
-        self.__log = CSVLogManager(self.__address_list[address_sel], dist, budget, tabu_list_size)
+        self.__log = CSVLogManager(self.__address_list[address_sel], dist, budget, tabu_list_size, itr)
         self.__nd.set_log(self.__log)
         self.__set_first_solution(address_sel, dist, budget)
         self.__loop(budget, itr)
