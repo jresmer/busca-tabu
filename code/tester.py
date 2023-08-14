@@ -12,5 +12,5 @@ class Tester:
                 for tabu_list_size in [20, 40, 80]:
                     for itr in [50, 75]:
                         tabu_search = TabuSearch()
-                        tabu_search.run(0, dist, budget, tabu_list_size, itr=itr)
+                        tabu_search.run(1, dist, budget, tabu_list_size, itr=itr)
                         dao.add(tabu_search.get_best_solution())
